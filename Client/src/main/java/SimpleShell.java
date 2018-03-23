@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +12,14 @@ public class SimpleShell {
 
 
     public static void prettyPrint(String output) {
-        // yep, make an effort to format things nicely, eh?
-        System.out.println(output);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Object json = mapper.readValue(output, Object.class);
+            String prettyPrintSets = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(json);
+            System.out.println(prettyPrintSets);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public static void main(String[] args) throws java.io.IOException {
 
@@ -19,6 +28,7 @@ public class SimpleShell {
         BufferedReader console = new BufferedReader
                 (new InputStreamReader(System.in));
 
+        ObjectMapper objectMapper = new ObjectMapper();
         ProcessBuilder pb = new ProcessBuilder();
         List<String> history = new ArrayList<String>();
         int index = 0;
@@ -59,19 +69,38 @@ public class SimpleShell {
                 // Specific Commands.
 
                 // ids
-                if (list.contains("ids")) {
+                if (list.contains("ids") && list.size() ==1) {
                     String results = webber.get_ids();
                     SimpleShell.prettyPrint(results);
                     continue;
                 }
 
+                if (list.contains("ids") && list.size() == 3) {
+                    String name = list.get(1);
+                    String gitHub = list.get(2);
+                    Id newUserId = new Id(name,gitHub);
+                    String newIdInfo = objectMapper.writeValueAsString(newUserId);
+                    webber.MakeURLCall("/ids", "POST", newIdInfo);
+                    continue;
+
+                }
+
                 // messages
-                if (list.contains("messages")) {
+                if (list.contains("messages") && list.size() ==1) {
                     String results = webber.get_messages();
                     SimpleShell.prettyPrint(results);
                     continue;
                 }
-                // you need to add a bunch more.
+
+                if (list.contains("send") && list.size()==4) {
+                    String fromid = list.get(1);
+                    String toid = list.get(3);
+                    String message = list.get(2);
+                    Message message1 = new Message(fromid,message,toid);
+                    String newMessage = objectMapper.writeValueAsString(message1);
+                    webber.MakeURLCall("/messages","POST",newMessage);
+                    continue;
+                }
 
                 //!! command returns the last command in history
                 if (list.get(list.size() - 1).equals("!!")) {

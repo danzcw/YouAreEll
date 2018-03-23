@@ -4,30 +4,30 @@ import okhttp3.Response;
 
 import java.io.IOException;
 
-public class User {
+public class Id {
 
-    private String userid = "";
+    private String id;
     private String name;
     private String github;
 
 
-    public User(String userid, String name, String github) {
-        this.userid = userid;
+    public Id(String id, String name, String github) {
+        this.id = id;
         this.name = name;
         this.github = github;
     }
 
-    public User(String name, String github) {
+    public Id(String name, String github) {
         this.name = name;
         this.github = github;
     }
 
     public String getUserid() {
-        return userid;
+        return id;
     }
 
     public void setUserid(String userid) {
-        this.userid = userid;
+        this.id = userid;
     }
 
     public String getName() {
@@ -49,7 +49,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "userid='" + userid + '\'' +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", github='" + github + '\'' +
                 '}';
